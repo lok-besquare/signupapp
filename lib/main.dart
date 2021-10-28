@@ -21,14 +21,14 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  final String img_url =
-      'https://p.kindpng.com/picc/s/20-203381_sign-up-icon-png-login-and-signup-icon.png';
-  final _snackBar = SnackBar(content: Text('You have successfully signed up.'));
+  final snackBar = SnackBar(content: Text('You have successfully signed up.'));
   final _username = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
   String _DropdownChoice = 'Male';
   bool _isButtonDisabled = false;
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
   // ignore: non_constant_identifier_names
   List<DropdownMenuItem<String>> get itemsList {
     List<DropdownMenuItem<String>> itemsList = [
@@ -42,26 +42,34 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void initState() {
-    _isButtonDisabled = false;
+    _username.addListener(checkAllEnter);
+    _email.addListener(checkAllEnter);
+    _password.addListener(checkAllEnter);
+    super.initState();
   }
 
   void checkAllEnter() {
     setState(() {
       if (_username.text.isNotEmpty &&
           _email.text.isNotEmpty &&
-          _password.text.isNotEmpty) {}
+          _password.text.isNotEmpty) {
+        _isButtonDisabled = true;
+      } else {
+        _isButtonDisabled = false;
+      }
     });
   }
 
-  void buttonStatus() {
-    setState(() {});
-  }
-
-  void directoHome() {}
+//   void buttonStatus() {
+//  ScaffoldMessenger.of(context).showSnackBar(
+//                       SnackBar(
+//                         content: const Text('Awesome! Successful sign in.'),
+//                       ) ,
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        scaffoldMessengerKey: scaffoldMessengerKey,
         home: Scaffold(
             appBar: AppBar(
               title: Text('Sign-Up Page'),
@@ -79,30 +87,27 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                 ),
+                SizedBox(height: 10),
                 Image.network(
-                  (img_url),
+                  "assets/sign-up.png",
                   width: 200,
+                  height: 200,
                   // fit: BoxFit.cover,
                 ),
                 TextFormField(
                   // ignore: deprecated_member_use
                   controller: _username,
-                  cursorColor: Theme.of(context).cursorColor,
                   maxLength: 20,
                   style: new TextStyle(),
                   decoration: InputDecoration(
                     icon: Icon(IconData(57938, fontFamily: 'MaterialIcons')),
                     labelText: 'Name',
                     hintText: 'Enter your name...',
-                    suffixIcon: Icon(
-                      Icons.check_circle,
-                    ),
                   ),
                 ),
                 TextFormField(
                   // ignore: deprecated_member_use
                   controller: _email,
-                  cursorColor: Theme.of(context).cursorColor,
                   maxLength: 20,
                   // style:TextStyle(color:Colors.amber,
                   // :20,
@@ -111,15 +116,11 @@ class _SignUpPageState extends State<SignUpPage> {
                     icon: Icon(IconData(57473, fontFamily: 'MaterialIcons')),
                     labelText: 'Email',
                     hintText: 'Enter your email...',
-                    suffixIcon: Icon(
-                      Icons.check_circle,
-                    ),
                   ),
                 ),
                 TextFormField(
                   // ignore: deprecated_member_use
                   controller: _password,
-                  cursorColor: Theme.of(context).cursorColor,
                   maxLength: 20,
                   obscureText: true,
                   enableSuggestions: false,
@@ -128,9 +129,6 @@ class _SignUpPageState extends State<SignUpPage> {
                     icon: Icon(IconData(58490, fontFamily: 'MaterialIcons')),
                     labelText: 'Password',
                     hintText: 'Enter your password...',
-                    suffixIcon: Icon(
-                      Icons.check_circle,
-                    ),
                   ),
                 ),
                 DropdownButtonFormField(
@@ -146,11 +144,20 @@ class _SignUpPageState extends State<SignUpPage> {
                       });
                     }),
                 SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    // Respond to button press
-                  },
-                  child: Text('Submit'),
+                Container(
+                  child: ElevatedButton(
+                    onPressed: !_isButtonDisabled
+                        ? null
+                        : () {
+                            scaffoldMessengerKey.currentState!
+                                .showSnackBar(SnackBar(
+                              content: const Text(
+                                  'You have successfully signed up!'),
+                            )); // _scaffoldKey.currentState.showSnackBar(new SnackBar(content: ''));
+                            // Respond to button press
+                          },
+                    child: Text('Submit'),
+                  ),
                 ),
               ],
 
